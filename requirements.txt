@@ -1,0 +1,8 @@
+pandas
+python-binance
+numpy
+requests
+matplotlib
+streamlit
+mplfinance
+watchdog
