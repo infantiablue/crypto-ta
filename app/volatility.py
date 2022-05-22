@@ -59,15 +59,25 @@ df2 = pd.DataFrame.from_dict(result)
 df2.columns = ['Symbol', 'Volatility', 'Volumne']
 df2.sort_values(by=['Volatility'], inplace=True, ascending=False)
 
-fig = plt.figure(figsize=(10, 4), dpi=512)  # Create matplotlib figure
+fig = plt.figure(figsize=(10, 4), dpi=1024)  # Create matplotlib figure
 ax = fig.add_subplot(111)  # Create matplotlib axes
 ax2 = ax.twinx()  # Create another axes that shares the same x-axis as ax.
 orange_patch = mpatches.Patch(color='orange', label='Volatility')
 ax2.legend(handles=[orange_patch])
 width = 0.1
-df2.head(10).plot(x="Symbol", y=[
-    "Volatility"], kind='bar', color='orange', ax=ax, width=width, position=1)
-df2.head(10).plot(x="Symbol", y=["Volumne"], kind='bar',
-                  color='green', ax=ax2, width=width, position=0)
+df2.head(10).plot(x="Symbol",
+                  y=["Volatility"],
+                  kind='bar',
+                  color='orange',
+                  ax=ax,
+                  width=width,
+                  position=1)
+df2.head(10).plot(x="Symbol",
+                  y=["Volumne"],
+                  kind='bar',
+                  color='green',
+                  ax=ax2,
+                  width=width,
+                  position=0)
 ax.set_ylabel('Volatility')
 ax2.set_ylabel('Volumne')

@@ -125,27 +125,37 @@ signals = [
     #                  color='r', y_on_right=False),
     # mpf.make_addplot(exp12,color='lime'),
     # mpf.make_addplot(exp26,color='c'),
-    mpf.make_addplot(df['Long Price'] , type='scatter', markersize=100, color='g', marker='^'),
-    mpf.make_addplot(df['Short Price'] , type='scatter', markersize=100, color='r', marker='v'),    
-    mpf.make_addplot(signal, panel=1, color='red', secondary_y=True),
-    mpf.make_addplot(histogram, type='bar', width=0.7, panel=1,
-                     color='dimgray', alpha=1, secondary_y=False),
-    mpf.make_addplot(macd, panel=1, color='green', secondary_y=True),
+    mpf.make_addplot(df['Long Price'], type='scatter',
+                     markersize=100, color='g', marker='^'),
+    mpf.make_addplot(df['Short Price'], type='scatter',
+                     markersize=100, color='r', marker='v'),
+    # mpf.make_addplot(signal, panel=1, color='red', secondary_y=True),
+    mpf.make_addplot(histogram, type='bar', width=0.65, panel=1,
+                     color='pink', alpha=1, secondary_y=True),
+    mpf.make_addplot(macd, panel=1, color='green', secondary_y=False),
     mpf.make_addplot(df['LowerB']),
-    mpf.make_addplot(df['UpperB']),    
+    mpf.make_addplot(df['UpperB']),
 ]
 # style  = mpf.make_mpf_style(base_mpl_style='yahoo')
 # mpf.plot(tdf,addplot=apd)
 
-renko_kwargs = dict(type=chart_type, style=chart_style, volume=True, mav=(mav1, mav2), tight_layout=True,
-                    datetime_format='%b-%d-%Y', returnfig=True)
+renko_kwargs = dict(type=chart_type,
+                    style=chart_style,
+                    volume=True,
+                    mav=(mav1, mav2),
+                    figsize=[20, 8],
+                    # tight_layout=True,
+                    datetime_format='%b-%d-%Y',
+                    returnfig=True)
 chart_kwargs = renko_kwargs | dict(
-    volume_panel=2, panel_ratios=(6, 3, 2), addplot=signals)
+    volume_panel=2,
+    panel_ratios=(6, 3, 2),
+    addplot=signals)
+
 if chart_type == 'renko' or chart_type == 'pnf':
     fig, ax = mpf.plot(df.set_index('Close Time'), **renko_kwargs)
 else:
     fig, ax = mpf.plot(df.set_index('Close Time'), **chart_kwargs)
-
 
 with st.container():
     st.pyplot(fig)
