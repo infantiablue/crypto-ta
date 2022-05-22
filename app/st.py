@@ -1,3 +1,4 @@
+from lib2to3.pgen2.pgen import DFAState
 import math
 import streamlit as st
 import os
@@ -8,6 +9,9 @@ import mplfinance as mpf
 from binance.client import Client
 from binance import Client
 from volatility import fig
+from ta.volatility import BollingerBands
+from ta.trend import EMAIndicator
+
 API_KEY = os.environ.get('BINANCE_API_KEY')
 API_SECRET = os.environ.get('BINANCE_API_SECRET')
 
@@ -89,6 +93,8 @@ df['Long Signals'] = df['Long Signals'].astype(
     'int').where(df['Long Signals'].notnull(), np.nan)
 df['Short Signals'] = df['Short Signals'].astype(
     'int').where(df['Short Signals'].notnull(), np.nan)
+df['Long Price'] = df['Low'].where(df['Long Signals'] > 0)
+df['Short Price'] = df['High'].where(df['Short Signals'] > 0)
 
 # MACD
 exp12 = df['Close'].ewm(span=12, adjust=False).mean()
@@ -97,18 +103,36 @@ macd = exp12 - exp26
 signal = macd.ewm(span=9, adjust=False).mean()
 histogram = macd - signal
 
+
+# Initialize Bollinger Bands Indicator
+indicator_bb = BollingerBands(close=df["Close"], window=20, window_dev=2)
+# Add Bollinger Bands features
+
+df['PercentB'] = indicator_bb.bollinger_pband()
+df['UpperB'] = indicator_bb.bollinger_hband()
+df['LowerB'] = indicator_bb.bollinger_lband()
+
+# Add Bollinger Band high & low indicator
+df['BB High'] = indicator_bb.bollinger_hband_indicator()
+df['BB Low'] = indicator_bb.bollinger_lband_indicator()
+
+
 # Plot
 signals = [
-    mpf.make_addplot(df['Long Signals'], type='bar',
-                     color='g',  y_on_right=False),
-    mpf.make_addplot(df['Short Signals'], type='bar',
-                     color='r', y_on_right=False),
+    # mpf.make_addplot(df['Long Signals'], type='bar',
+    #                  color='g',  y_on_right=False),
+    # mpf.make_addplot(df['Short Signals'], type='bar',
+    #                  color='r', y_on_right=False),
     # mpf.make_addplot(exp12,color='lime'),
     # mpf.make_addplot(exp26,color='c'),
+    mpf.make_addplot(df['Long Price'] , type='scatter', markersize=100, color='g', marker='^'),
+    mpf.make_addplot(df['Short Price'] , type='scatter', markersize=100, color='r', marker='v'),    
     mpf.make_addplot(signal, panel=1, color='red', secondary_y=True),
     mpf.make_addplot(histogram, type='bar', width=0.7, panel=1,
                      color='dimgray', alpha=1, secondary_y=False),
-    mpf.make_addplot(macd, panel=1, color='green', secondary_y=True)
+    mpf.make_addplot(macd, panel=1, color='green', secondary_y=True),
+    mpf.make_addplot(df['LowerB']),
+    mpf.make_addplot(df['UpperB']),    
 ]
 # style  = mpf.make_mpf_style(base_mpl_style='yahoo')
 # mpf.plot(tdf,addplot=apd)
